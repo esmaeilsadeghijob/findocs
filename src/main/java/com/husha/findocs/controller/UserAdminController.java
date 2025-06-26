@@ -14,6 +14,7 @@ import java.util.UUID;
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserAdminController {
 
     private final UserRepository userRepository;

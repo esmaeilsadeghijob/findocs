@@ -16,9 +16,10 @@ import java.util.UUID;
 public class Attachment {
 
     @Id
-    private String id;
+    private String id = UUID.randomUUID().toString();
 
     private UUID documentId;
+
 
     private List<FileMeta> attachments = new ArrayList<>();
 
