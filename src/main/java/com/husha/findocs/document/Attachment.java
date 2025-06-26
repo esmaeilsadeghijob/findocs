@@ -20,6 +20,8 @@ public class Attachment {
 
     private UUID documentId;
 
+    private String createdBy; // 👈 نام ایجادکننده مجموعه ضمائم (اختیاری)
+
     private List<FileMeta> attachments = new ArrayList<>();
 
     @Data

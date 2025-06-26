@@ -33,4 +33,6 @@ public class Document {
     private String description;
     private String nature;
     private Instant createdAt;
+
+    private String createdBy;
 }
