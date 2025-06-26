@@ -1,0 +1,10 @@
+mongo
+
+use findocs_mongo
+
+db.attachments.insertOne({
+  documentId: UUID(),
+  attachments: []
+})
+
+

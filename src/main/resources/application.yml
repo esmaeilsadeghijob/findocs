@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/findocs_db
+    username: postgres
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/findocs_mongo
+
+jwt:
+  secret: your_very_secret_key_12345678901234567890123456789012
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
