@@ -27,6 +27,10 @@ public class Document {
     @ManyToOne
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "unit_id")
+    private Unit unit;
+
     private String documentNumber;
     private String fiscalYear;
     private LocalDate documentDate;
