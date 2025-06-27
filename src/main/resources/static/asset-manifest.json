@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.1f928dc7.css",
+    "main.js": "/static/js/main.4c1e41a3.js",
+    "static/js/453.eb44ab81.chunk.js": "/static/js/453.eb44ab81.chunk.js",
+    "static/media/IranNastaliq.ttf": "/static/media/IranNastaliq.244ccc29fc6f22b136fa.ttf",
+    "static/media/Lalezar-Regular.ttf": "/static/media/Lalezar-Regular.241ca811c53de4ed36a4.ttf",
+    "static/media/Vazirmatn-Regular.ttf": "/static/media/Vazirmatn-Regular.f08bc22d4f5bb01fb82f.ttf",
+    "static/media/Digikala -_font.ttf": "/static/media/Digikala -_font.7bd94866eafc41772007.ttf",
+    "index.html": "/index.html",
+    "main.1f928dc7.css.map": "/static/css/main.1f928dc7.css.map",
+    "main.4c1e41a3.js.map": "/static/js/main.4c1e41a3.js.map",
+    "453.eb44ab81.chunk.js.map": "/static/js/453.eb44ab81.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1f928dc7.css",
+    "static/js/main.4c1e41a3.js"
+  ]
+}

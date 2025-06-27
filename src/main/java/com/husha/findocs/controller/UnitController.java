@@ -12,6 +12,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/units")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class UnitController {
 
     private final UnitService unitService;

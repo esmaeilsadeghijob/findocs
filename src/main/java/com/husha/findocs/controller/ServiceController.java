@@ -12,6 +12,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/services")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class ServiceController {
 
     private final SService sservice;

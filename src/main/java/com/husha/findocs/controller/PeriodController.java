@@ -12,6 +12,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/periods")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class PeriodController {
 
     private final PeriodService periodService;

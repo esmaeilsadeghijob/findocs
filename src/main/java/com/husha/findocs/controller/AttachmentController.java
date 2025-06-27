@@ -1,13 +1,11 @@
 package com.husha.findocs.controller;
 
-import com.husha.findocs.document.Attachment;
 import com.husha.findocs.document.Attachment.FileMeta;
 import com.husha.findocs.model.User;
 import com.husha.findocs.service.AttachmentService;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +38,14 @@ public class AttachmentController {
         }
     }
 
+    @PostMapping("/{documentId}/attachments")
+    public ResponseEntity<?> uploadAttachments(@PathVariable UUID documentId,
+                                               @RequestParam("files") MultipartFile[] files,
+                                               @AuthenticationPrincipal User user) {
+        attachmentService.uploadFiles(documentId, files, user.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{documentId}")
     public ResponseEntity<List<FileMeta>> getAttachments(@PathVariable UUID documentId) {
         return attachmentService.getAttachments(documentId)
@@ -64,12 +70,31 @@ public class AttachmentController {
                         .body(file.getFileData()))
                 .orElse(ResponseEntity.notFound().build());
     }
-    @PostMapping("/{id}/attachments")
-    public ResponseEntity<?> uploadAttachments(@PathVariable UUID id,
-                                               @RequestParam("files") MultipartFile[] files,
-                                               @AuthenticationPrincipal User user) {
-        attachmentService.uploadFiles(id, files, user.getUsername());
-        return ResponseEntity.ok().build();
+
+    @GetMapping("/{documentId}/file/{fileId}")
+    public ResponseEntity<byte[]> downloadRawFile(@PathVariable UUID documentId,
+                                                  @PathVariable String fileId) {
+        Optional<FileMeta> fileOpt = attachmentService.getFileMeta(documentId, fileId);
+        return fileOpt.map(file -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(file.getMimeType()));
+            headers.setContentDisposition(ContentDisposition.inline().filename(file.getFileName()).build());
+            return new ResponseEntity<>(file.getFileData(), headers, HttpStatus.OK);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // ⬇ مسیر عمومی برای پیش‌نمایش فایل در embed/image بدون نیاز به احراز هویت
+    @GetMapping("/public/{documentId}/file/{fileId}")
+    @PermitAll
+    public ResponseEntity<byte[]> viewFilePublic(@PathVariable UUID documentId,
+                                                 @PathVariable String fileId) {
+        Optional<FileMeta> fileOpt = attachmentService.getFileMeta(documentId, fileId);
+        return fileOpt.map(file -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(file.getMimeType()));
+            headers.setContentDisposition(ContentDisposition.inline().filename(file.getFileName()).build());
+            return new ResponseEntity<>(file.getFileData(), headers, HttpStatus.OK);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
 }

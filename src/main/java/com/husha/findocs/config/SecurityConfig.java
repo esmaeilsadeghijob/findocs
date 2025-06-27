@@ -1,6 +1,5 @@
 package com.husha.findocs.config;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,15 +35,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 🔐 پیکربندی کامل Security همراه با فعال‌سازی CORS
+    // 🔐 پیکربندی Security همراه با CORS و اجازه نمایش فایل داخل embed
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors() // ⬅ فعال‌سازی CORS
+                .cors()
                 .and()
                 .csrf().disable()
+                .headers(headers -> headers.frameOptions().disable())
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/api/attachments/public/**").permitAll() // ✅ این خط اضافه شده
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
@@ -55,7 +56,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    // 🎯 تعریف منبع پیکربندی CORS
+    // 🎯 تنظیم CORS برای ارتباط بین React و Spring
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
