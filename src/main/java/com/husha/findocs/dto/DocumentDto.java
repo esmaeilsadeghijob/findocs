@@ -8,11 +8,12 @@ import java.util.UUID;
 @Data
 public class DocumentDto {
     private UUID clientId;
-    private UUID projectId;
+    private UUID unitId;
+    private UUID serviceId;
+    private UUID periodId;
+
     private String documentNumber;
-    private String fiscalYear;
     private LocalDate documentDate;
     private String description;
     private String nature;
 }
-

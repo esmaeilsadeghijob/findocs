@@ -64,4 +64,12 @@ public class AttachmentController {
                         .body(file.getFileData()))
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PostMapping("/{id}/attachments")
+    public ResponseEntity<?> uploadAttachments(@PathVariable UUID id,
+                                               @RequestParam("files") MultipartFile[] files,
+                                               @AuthenticationPrincipal User user) {
+        attachmentService.uploadFiles(id, files, user.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
 }

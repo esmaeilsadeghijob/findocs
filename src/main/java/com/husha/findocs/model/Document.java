@@ -22,21 +22,25 @@ public class Document {
     private Client client;
 
     @ManyToOne
-    private Project project;
-
-    @ManyToOne
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
 
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private ServiceEntity service;
+
+    @ManyToOne
+    @JoinColumn(name = "period_id")
+    private Period period;
+
     private String documentNumber;
-    private String fiscalYear;
     private LocalDate documentDate;
     private String description;
     private String nature;
-    private Instant createdAt;
 
+    private Instant createdAt;
     private String createdBy;
 }

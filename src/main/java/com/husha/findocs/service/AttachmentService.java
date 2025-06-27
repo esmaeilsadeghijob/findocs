@@ -22,24 +22,21 @@ public class AttachmentService {
     public void addAttachment(UUID documentId, MultipartFile file, String username,
                               String description, String nature) throws IOException {
 
-        // گرفتن یا ساختن مجموعه Attachment مرتبط با سند
         Attachment attachment = attachmentRepo.findByDocumentId(documentId)
                 .orElseGet(() -> {
                     Attachment att = new Attachment();
                     att.setId(null);
                     att.setDocumentId(documentId);
-                    att.setCreatedBy(username); // 👈 ثبت ایجادکننده مجموعه
+                    att.setCreatedBy(username);
                     att.setAttachments(new ArrayList<>());
                     return att;
                 });
 
-        // استخراج پسوند فایل
         String originalName = file.getOriginalFilename();
         String ext = (originalName != null && originalName.contains("."))
                 ? originalName.substring(originalName.lastIndexOf('.') + 1)
                 : "unknown";
 
-        // ساخت متادیتای فایل
         FileMeta meta = new FileMeta();
         meta.setId(UUID.randomUUID().toString());
         meta.setFileName(originalName);
@@ -51,10 +48,46 @@ public class AttachmentService {
         meta.setExtension(ext.toLowerCase());
         meta.setFileData(file.getBytes());
 
-        // افزودن فایل به لیست
         attachment.getAttachments().add(meta);
 
-        // ذخیره در MongoDB
+        attachmentRepo.save(attachment);
+    }
+
+    // ✅ متد جدید برای بارگذاری چند فایل
+    public void uploadFiles(UUID documentId, MultipartFile[] files, String username) {
+        Attachment attachment = attachmentRepo.findByDocumentId(documentId)
+                .orElseGet(() -> {
+                    Attachment att = new Attachment();
+                    att.setId(null);
+                    att.setDocumentId(documentId);
+                    att.setCreatedBy(username);
+                    att.setAttachments(new ArrayList<>());
+                    return att;
+                });
+
+        for (MultipartFile file : files) {
+            try {
+                String originalName = file.getOriginalFilename();
+                String ext = (originalName != null && originalName.contains("."))
+                        ? originalName.substring(originalName.lastIndexOf('.') + 1)
+                        : "unknown";
+
+                FileMeta meta = new FileMeta();
+                meta.setId(UUID.randomUUID().toString());
+                meta.setFileName(originalName);
+                meta.setUploadedAt(Instant.now());
+                meta.setUploadedBy(username);
+                meta.setMimeType(file.getContentType());
+                meta.setExtension(ext.toLowerCase());
+                meta.setFileData(file.getBytes());
+
+                attachment.getAttachments().add(meta);
+
+            } catch (IOException e) {
+                throw new RuntimeException("خطا در خواندن فایل " + file.getOriginalFilename());
+            }
+        }
+
         attachmentRepo.save(attachment);
     }
 
