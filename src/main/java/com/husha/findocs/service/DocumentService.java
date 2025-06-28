@@ -55,10 +55,32 @@ public class DocumentService {
         return documentRepository.save(doc);
     }
 
+//    public List<Document> getDocumentsForUser(User user) {
+//        if (user.getRole().getName().equals("ROLE_ADMIN")) {
+//            return documentRepository.findAll();
+//        }
+//        return documentRepository.findByUser(user);
+//    }
+
     public List<Document> getDocumentsForUser(User user) {
+        List<Document> result;
         if (user.getRole().getName().equals("ROLE_ADMIN")) {
-            return documentRepository.findAll();
+            result = documentRepository.findAll();
+        } else {
+            result = documentRepository.findByUser(user);
         }
-        return documentRepository.findByUser(user);
+
+        return result.stream()
+                .filter(Document::isActive) // ✅ فقط سندهای فعال
+                .toList();
     }
+
+    public void deactivateDocument(UUID documentId) {
+        Document doc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("سند یافت نشد"));
+        doc.setActive(false);
+        documentRepository.save(doc);
+    }
+
+
 }

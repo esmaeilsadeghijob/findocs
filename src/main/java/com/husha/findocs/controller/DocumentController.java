@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -35,4 +36,11 @@ public class DocumentController {
         List<Document> docs = documentService.getDocumentsForUser(user);
         return ResponseEntity.ok(docs);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDocument(@PathVariable UUID id) {
+        documentService.deactivateDocument(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

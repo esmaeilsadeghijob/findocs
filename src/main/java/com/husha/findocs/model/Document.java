@@ -43,4 +43,7 @@ public class Document {
 
     private Instant createdAt;
     private String createdBy;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }

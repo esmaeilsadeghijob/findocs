@@ -53,3 +53,31 @@ use findocs_mongo
 db.attachments.find().pretty()
 
 ````
+
+````
+customer   
+
+1 اداره کل نوسازی مدارس استان قم   cid
+
+units   uid
+اسناد ذیحسابی
+بایگانی امور قراردادها
+
+periods   pid
+1401
+1402
+1403
+1404
+
+services   sid
+بایگانی اسناد مالی
+
+
+[همه جداول اصلی  دارای
+sid
+cid
+uid
+pid
+باشند
+
+````
