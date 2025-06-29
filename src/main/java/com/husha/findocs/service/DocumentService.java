@@ -6,6 +6,7 @@ import com.husha.findocs.repository.*;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +23,7 @@ public class DocumentService {
     private final ServiceRepository serviceRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public Document createDocument(DocumentDto dto, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("کاربر یافت نشد"));
@@ -29,7 +31,7 @@ public class DocumentService {
         Client client = clientRepository.findById(dto.getClientId())
                 .orElseThrow(() -> new RuntimeException("مشتری یافت نشد"));
 
-        Unit unit = unitRepository.findById(dto.getUnitId())
+        Unit unit = unitRepository.fetchWithAllFields(dto.getUnitId())
                 .orElseThrow(() -> new RuntimeException("واحد یافت نشد"));
 
         Period period = periodRepository.findById(dto.getPeriodId())
@@ -49,17 +51,17 @@ public class DocumentService {
         doc.setDocumentDate(dto.getDocumentDate());
         doc.setDescription(dto.getDescription());
         doc.setNature(dto.getNature());
-        doc.setStatus(DocumentStatus.DRAFT); // وضعیت پیش‌فرض
-        doc.setActive(true);                  // فعال بودن سند
+        doc.setStatus(DocumentStatus.DRAFT);
+        doc.setActive(true);
         doc.setCreatedAt(Instant.now());
         doc.setCreatedBy(username);
 
         return documentRepository.save(doc);
     }
 
-    public List<Document> getDocumentsForUser(User user) {
+    public List<DocumentDto> getDocumentsForUser(User user) {
         List<Document> result;
-        if (user.getRole().getName().equals("ROLE_ADMIN")) {
+        if ("ROLE_ADMIN".equals(user.getRole().getName())) {
             result = documentRepository.findAll();
         } else {
             result = documentRepository.findByUser(user);
@@ -67,6 +69,7 @@ public class DocumentService {
 
         return result.stream()
                 .filter(Document::isActive)
+                .map(DocumentDto::from)
                 .toList();
     }
 
@@ -77,19 +80,20 @@ public class DocumentService {
         documentRepository.save(doc);
     }
 
-    public boolean advanceStatus(UUID id) {
+    public Document advanceStatus(UUID id) {
         Document doc = documentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("سند یافت نشد"));
 
-        if (doc.getStatus() == DocumentStatus.FINALIZED)
-            return false;
+        if (doc.getStatus() == DocumentStatus.FINALIZED) {
+            return doc; // تغییری اعمال نمی‌کنیم
+        }
 
-        if (doc.getStatus() == DocumentStatus.DRAFT)
+        if (doc.getStatus() == DocumentStatus.DRAFT) {
             doc.setStatus(DocumentStatus.SUBMITTED);
-        else if (doc.getStatus() == DocumentStatus.SUBMITTED)
+        } else if (doc.getStatus() == DocumentStatus.SUBMITTED) {
             doc.setStatus(DocumentStatus.FINALIZED);
+        }
 
-        documentRepository.save(doc);
-        return true;
+        return documentRepository.save(doc);
     }
 }

@@ -31,4 +31,7 @@ public class Client {
     @JoinColumn(name = "service_id", nullable = false)
     private ServiceEntity service;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
+
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,19 +39,8 @@ public class ClientService {
     public Client create(Client client) {
         client.setId(UUID.randomUUID());
         client.setCreatedAt(Instant.now());
+        client.setActive(true);
         return clientRepository.save(client);
-    }
-
-    @Transactional
-    public Client update(UUID id, Client updated) {
-        Client existing = getById(id);
-        existing.setIdentifierCode(updated.getIdentifierCode());
-        return clientRepository.save(existing);
-    }
-
-    @Transactional
-    public void delete(UUID id) {
-        clientRepository.deleteById(id);
     }
 
     @Transactional
@@ -61,12 +51,20 @@ public class ClientService {
         ServiceEntity service = serviceRepository.findById(dto.getServiceId())
                 .orElseThrow(() -> new RuntimeException("سرویس یافت نشد"));
 
-        // بررسی تکراری بودن
-        boolean exists = clientRepository.existsByIdentifierCodeAndUnitAndService(
-                dto.getIdentifierCode(), unit, service);
+        Optional<Client> optionalClient = clientRepository.findByIdentifierCodeAndUnitAndService(
+                dto.getIdentifierCode(), unit, service
+        );
 
-        if (exists)
-            throw new RuntimeException("شناسه مشتری با این سرویس و واحد قبلاً ثبت شده");
+        if (optionalClient.isPresent()) {
+            Client existing = optionalClient.get();
+            if (!existing.isActive()) {
+                existing.setActive(true);
+                existing.setCreatedAt(Instant.now());
+                return clientRepository.save(existing);
+            } else {
+                throw new RuntimeException("مشتری با این اطلاعات وجود دارد");
+            }
+        }
 
         Client client = Client.builder()
                 .id(UUID.randomUUID())
@@ -74,8 +72,33 @@ public class ClientService {
                 .unit(unit)
                 .service(service)
                 .createdAt(Instant.now())
+                .active(true)
                 .build();
 
         return clientRepository.save(client);
+    }
+
+    @Transactional
+    public Client update(UUID id, ClientDto dto) {
+        Client existing = getById(id);
+
+        Unit unit = unitRepository.findById(dto.getUnitId())
+                .orElseThrow(() -> new RuntimeException("واحد یافت نشد"));
+
+        ServiceEntity service = serviceRepository.findById(dto.getServiceId())
+                .orElseThrow(() -> new RuntimeException("سرویس یافت نشد"));
+
+        existing.setIdentifierCode(dto.getIdentifierCode());
+        existing.setUnit(unit);
+        existing.setService(service);
+
+        return clientRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        Client client = getById(id);
+        client.setActive(false);
+        clientRepository.save(client);
     }
 }

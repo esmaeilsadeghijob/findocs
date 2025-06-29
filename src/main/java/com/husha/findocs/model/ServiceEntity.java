@@ -1,5 +1,6 @@
 package com.husha.findocs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,4 +22,9 @@ public class ServiceEntity {
     private String name; // نام سرویس
 
     private Instant createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id")
+    @JsonIgnore
+    private Unit unit;
 }

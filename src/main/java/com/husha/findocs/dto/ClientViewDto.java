@@ -13,13 +13,18 @@ public class ClientViewDto {
     private String identifierCode;
     private String unitName;
     private String serviceName;
+    private UUID unitId;
+    private UUID serviceId;
 
     public static ClientViewDto from(Client client) {
         return new ClientViewDto(
                 client.getId(),
                 client.getIdentifierCode(),
                 client.getUnit().getName(),
-                client.getService().getName()
+                client.getService().getName(),
+                client.getUnit().getId(),      // ✅ unitId
+                client.getService().getId()    // ✅ serviceId
         );
     }
+
 }

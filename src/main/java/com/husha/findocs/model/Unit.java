@@ -1,7 +1,9 @@
 package com.husha.findocs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -10,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Unit {
     @Id
     private UUID id;

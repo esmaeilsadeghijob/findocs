@@ -3,11 +3,9 @@ package com.husha.findocs.controller;
 import com.husha.findocs.dto.DocumentDto;
 import com.husha.findocs.model.Document;
 import com.husha.findocs.model.User;
-import com.husha.findocs.repository.UserRepository;
 import com.husha.findocs.service.DocumentService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,18 +20,17 @@ import java.util.UUID;
 public class DocumentController {
 
     private final DocumentService documentService;
-    private final UserRepository userRepository;
 
     @PostMapping
-    public ResponseEntity<Document> create(@RequestBody DocumentDto dto,
-                                           @AuthenticationPrincipal User user) {
-        Document doc = documentService.createDocument(dto, user.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(doc);
+    public ResponseEntity<DocumentDto> create(@RequestBody DocumentDto dto,
+                                              @AuthenticationPrincipal User user) {
+        Document saved = documentService.createDocument(dto, user.getUsername());
+        return ResponseEntity.status(201).body(DocumentDto.from(saved));
     }
 
     @GetMapping
-    public ResponseEntity<List<Document>> getAll(@AuthenticationPrincipal User user) {
-        List<Document> docs = documentService.getDocumentsForUser(user);
+    public ResponseEntity<List<DocumentDto>> getAll(@AuthenticationPrincipal User user) {
+        List<DocumentDto> docs = documentService.getDocumentsForUser(user);
         return ResponseEntity.ok(docs);
     }
 
@@ -44,12 +41,8 @@ public class DocumentController {
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Void> changeStatus(@PathVariable UUID id) {
-        boolean success = documentService.advanceStatus(id);
-        if (!success) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<DocumentDto> changeStatus(@PathVariable UUID id) {
+        Document updated = documentService.advanceStatus(id);
+        return ResponseEntity.ok(DocumentDto.from(updated));
     }
-
 }
