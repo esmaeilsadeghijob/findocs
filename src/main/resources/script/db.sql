@@ -1,5 +1,5 @@
 -- اجرای این بخش باید خارج از دیتابیسی که وجود داره انجام بشه (مثلاً از postgres یا template1)
-CREATE DATABASE findocs_db
+CREATE DATABASE findocsdb
     WITH OWNER = postgres
     ENCODING = 'UTF8'
     LC_COLLATE = 'en_US.utf8'
@@ -8,5 +8,5 @@ CREATE DATABASE findocs_db
 
 
 -----------
-\c findocs_db;
+\c findocsdb;
 

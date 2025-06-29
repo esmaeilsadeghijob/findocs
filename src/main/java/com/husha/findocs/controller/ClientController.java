@@ -1,11 +1,15 @@
 package com.husha.findocs.controller;
 
+import com.husha.findocs.dto.ClientDto;
+import com.husha.findocs.dto.ClientViewDto;
 import com.husha.findocs.model.Client;
+import com.husha.findocs.model.Unit;
 import com.husha.findocs.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,9 +21,17 @@ public class ClientController {
 
     private final ClientService clientService;
 
+//    @GetMapping
+//    public ResponseEntity<List<Client>> getAll() {
+//        return ResponseEntity.ok(clientService.getAll());
+//    }
+
     @GetMapping
-    public ResponseEntity<List<Client>> getAll() {
-        return ResponseEntity.ok(clientService.getAll());
+    public ResponseEntity<List<ClientViewDto>> getAll() {
+        List<ClientViewDto> list = clientService.getAll().stream()
+                .map(ClientViewDto::from)
+                .toList();
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
@@ -27,7 +39,7 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getById(id));
     }
 
-    @PostMapping
+    @PostMapping("raw")
     public ResponseEntity<Client> create(@RequestBody Client client) {
         return ResponseEntity.ok(clientService.create(client));
     }
@@ -42,4 +54,10 @@ public class ClientController {
         clientService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping
+    public ResponseEntity<Client> create(@RequestBody ClientDto dto) {
+        return ResponseEntity.ok(clientService.create(dto));
+    }
+
 }

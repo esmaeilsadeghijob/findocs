@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,8 +42,9 @@ public class AttachmentController {
     @PostMapping("/{documentId}/attachments")
     public ResponseEntity<?> uploadAttachments(@PathVariable UUID documentId,
                                                @RequestParam("files") MultipartFile[] files,
+                                               @RequestParam(required = false) String[] descriptions,
                                                @AuthenticationPrincipal User user) {
-        attachmentService.uploadFiles(documentId, files, user.getUsername());
+        attachmentService.uploadFiles(documentId, files, descriptions, user.getUsername());
         return ResponseEntity.ok().build();
     }
 
@@ -83,7 +85,6 @@ public class AttachmentController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ⬇ مسیر عمومی برای پیش‌نمایش فایل در embed/image بدون نیاز به احراز هویت
     @GetMapping("/public/{documentId}/file/{fileId}")
     @PermitAll
     public ResponseEntity<byte[]> viewFilePublic(@PathVariable UUID documentId,
@@ -97,4 +98,14 @@ public class AttachmentController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/upload")
+    public ResponseEntity<Void> upload(
+            @RequestParam("documentId") UUID documentId,
+            @RequestParam("files") MultipartFile[] files,
+            @RequestParam(value = "descriptions", required = false) String[] descriptions,
+            Principal principal
+    ) {
+        attachmentService.uploadFiles(documentId, files, descriptions, principal.getName());
+        return ResponseEntity.ok().build();
+    }
 }

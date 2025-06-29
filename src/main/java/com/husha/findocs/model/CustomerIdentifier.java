@@ -10,12 +10,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Unit {
+public class CustomerIdentifier {
+
     @Id
     private UUID id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String code; // کد یا شناسه منحصر‌به‌فرد
+
+    private String description; // توضیح دلخواه یا برچسب
 
     private Instant createdAt;
 }

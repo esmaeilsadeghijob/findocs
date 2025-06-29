@@ -43,4 +43,13 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> changeStatus(@PathVariable UUID id) {
+        boolean success = documentService.advanceStatus(id);
+        if (!success) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
 }

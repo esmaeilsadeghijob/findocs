@@ -32,6 +32,24 @@ public class AttachmentService {
                     return att;
                 });
 
+        attachment.getAttachments().add(createMeta(file, username, description, nature));
+
+        attachmentRepo.save(attachment);
+    }
+
+    public void uploadFiles(UUID documentId, MultipartFile[] files, String[] descriptions, String username) {
+        for (int i = 0; i < files.length; i++) {
+            MultipartFile file = files[i];
+            String desc = (descriptions != null && i < descriptions.length) ? descriptions[i] : null;
+            try {
+                addAttachment(documentId, file, username, desc, null);
+            } catch (IOException e) {
+                throw new RuntimeException("خطا در بارگذاری فایل: " + file.getOriginalFilename());
+            }
+        }
+    }
+
+    private FileMeta createMeta(MultipartFile file, String username, String description, String nature) throws IOException {
         String originalName = file.getOriginalFilename();
         String ext = (originalName != null && originalName.contains("."))
                 ? originalName.substring(originalName.lastIndexOf('.') + 1)
@@ -48,47 +66,7 @@ public class AttachmentService {
         meta.setExtension(ext.toLowerCase());
         meta.setFileData(file.getBytes());
 
-        attachment.getAttachments().add(meta);
-
-        attachmentRepo.save(attachment);
-    }
-
-    // ✅ متد جدید برای بارگذاری چند فایل
-    public void uploadFiles(UUID documentId, MultipartFile[] files, String username) {
-        Attachment attachment = attachmentRepo.findByDocumentId(documentId)
-                .orElseGet(() -> {
-                    Attachment att = new Attachment();
-                    att.setId(null);
-                    att.setDocumentId(documentId);
-                    att.setCreatedBy(username);
-                    att.setAttachments(new ArrayList<>());
-                    return att;
-                });
-
-        for (MultipartFile file : files) {
-            try {
-                String originalName = file.getOriginalFilename();
-                String ext = (originalName != null && originalName.contains("."))
-                        ? originalName.substring(originalName.lastIndexOf('.') + 1)
-                        : "unknown";
-
-                FileMeta meta = new FileMeta();
-                meta.setId(UUID.randomUUID().toString());
-                meta.setFileName(originalName);
-                meta.setUploadedAt(Instant.now());
-                meta.setUploadedBy(username);
-                meta.setMimeType(file.getContentType());
-                meta.setExtension(ext.toLowerCase());
-                meta.setFileData(file.getBytes());
-
-                attachment.getAttachments().add(meta);
-
-            } catch (IOException e) {
-                throw new RuntimeException("خطا در خواندن فایل " + file.getOriginalFilename());
-            }
-        }
-
-        attachmentRepo.save(attachment);
+        return meta;
     }
 
     public Optional<Attachment> getAttachments(UUID documentId) {

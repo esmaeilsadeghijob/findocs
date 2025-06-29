@@ -45,5 +45,9 @@ public class Document {
     private String createdBy;
 
     @Column(nullable = false)
-    private boolean active = true;
+    private boolean isActive = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DocumentStatus status = DocumentStatus.DRAFT;
 }

@@ -49,18 +49,13 @@ public class DocumentService {
         doc.setDocumentDate(dto.getDocumentDate());
         doc.setDescription(dto.getDescription());
         doc.setNature(dto.getNature());
+        doc.setStatus(DocumentStatus.DRAFT); // وضعیت پیش‌فرض
+        doc.setActive(true);                  // فعال بودن سند
         doc.setCreatedAt(Instant.now());
         doc.setCreatedBy(username);
 
         return documentRepository.save(doc);
     }
-
-//    public List<Document> getDocumentsForUser(User user) {
-//        if (user.getRole().getName().equals("ROLE_ADMIN")) {
-//            return documentRepository.findAll();
-//        }
-//        return documentRepository.findByUser(user);
-//    }
 
     public List<Document> getDocumentsForUser(User user) {
         List<Document> result;
@@ -71,7 +66,7 @@ public class DocumentService {
         }
 
         return result.stream()
-                .filter(Document::isActive) // ✅ فقط سندهای فعال
+                .filter(Document::isActive)
                 .toList();
     }
 
@@ -82,5 +77,19 @@ public class DocumentService {
         documentRepository.save(doc);
     }
 
+    public boolean advanceStatus(UUID id) {
+        Document doc = documentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("سند یافت نشد"));
 
+        if (doc.getStatus() == DocumentStatus.FINALIZED)
+            return false;
+
+        if (doc.getStatus() == DocumentStatus.DRAFT)
+            doc.setStatus(DocumentStatus.SUBMITTED);
+        else if (doc.getStatus() == DocumentStatus.SUBMITTED)
+            doc.setStatus(DocumentStatus.FINALIZED);
+
+        documentRepository.save(doc);
+        return true;
+    }
 }
