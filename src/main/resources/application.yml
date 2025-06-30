@@ -29,3 +29,8 @@ springdoc:
     path: /v3/api-docs
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
